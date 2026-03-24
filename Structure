@@ -1,0 +1,83 @@
+Home
+│
+├── 1. Foundations of Card Payments
+│     ├── 1.1 The Payments Ecosystem
+│     ├── 1.2 Card Types & PAN Structure
+│     ├── 1.3 Issuers, Acquirers & Schemes
+│     ├── 1.4 Authorization, Clearing & Settlement
+│     └── 1.5 Key Industry Players
+│
+├── 2. Authorization & Transaction Flows
+│     ├── 2.1 ISO 8583 Overview
+│     ├── 2.2 EMV, Contactless & Magstripe
+│     ├── 2.3 Online vs Offline Authorization
+│     ├── 2.4 Declines, Soft Declines & Referrals
+│     └── 2.5 MCCs, CVV, AVS & SCA Basics
+│
+├── 3. Authentication & 3‑D Secure
+│     ├── 3.1 3DS 1 vs 3DS 2
+│     ├── 3.2 Frictionless vs Challenge
+│     ├── 3.3 SCA Exemptions
+│     ├── 3.4 AReq, CReq, RReq Flows
+│     └── 3.5 Directory Server, ACS & 3DS Server
+│
+├── 4. Fraud & Risk Management
+│     ├── 4.1 Fraud Typologies
+│     ├── 4.2 Device Fingerprinting
+│     ├── 4.3 Behavioural Biometrics
+│     ├── 4.4 Velocity Rules & Risk Scoring
+│     ├── 4.5 Case Management
+│     └── 4.6 Chargebacks & Disputes
+│
+├── 5. Acquiring & Merchant Services
+│     ├── 5.1 Merchant Onboarding & KYB
+│     ├── 5.2 Gateways & Processors
+│     ├── 5.3 Settlement Cycles
+│     ├── 5.4 Interchange & Scheme Fees
+│     ├── 5.5 Terminal Management
+│     └── 5.6 Liability Shifts
+│
+├── 6. Developer & Integration Track
+│     ├── 6.1 Payment API Fundamentals
+│     ├── 6.2 Tokenization & PCI DSS
+│     ├── 6.3 Webhooks & Callbacks
+│     ├── 6.4 Idempotency & Retries
+│     ├── 6.5 Error Handling
+│     └── 6.6 Observability & Logging
+│
+├── 7. Scheme Rules & Compliance
+│     ├── 7.1 Visa Core Rules
+│     ├── 7.2 Mastercard Rules
+│     ├── 7.3 PSD2 & SCA
+│     ├── 7.4 AML & CTF
+│     ├── 7.5 PCI DSS
+│     └── 7.6 Network Monitoring Programs
+│
+├── 8. Advanced Payments Architecture
+│     ├── 8.1 Network Tokenization (VTS, MDES)
+│     ├── 8.2 Recurring Payments & MIT
+│     ├── 8.3 Real‑Time Fraud Orchestration
+│     ├── 8.4 AI/ML in Fraud Detection
+│     ├── 8.5 Cross‑Border Payments
+│     └── 8.6 Embedded Finance & BIN Sponsorship
+│
+├── 9. Hands‑On Labs
+│     ├── 9.1 Parse an ISO 8583 Message
+│     ├── 9.2 Build a 3DS 2.2 Flow
+│     ├── 9.3 Analyse a Fraud Case
+│     ├── 9.4 Build a Risk‑Scoring Engine
+│     ├── 9.5 Implement a Payment API
+│     └── 9.6 Dispute Reason‑Code Classifier
+│
+├── 10. Certification Paths
+│     ├── CPA — Card Payments Associate
+│     ├── CPP — Card Payments Professional
+│     └── SPS — Senior Payments Specialist
+│
+└── Resources
+      ├── Glossary
+      ├── Scheme Rule Summaries
+      ├── Dispute Reason‑Code Reference
+      ├── PSD2/SCA Quick Guide
+      ├── Fraud Typology Catalogue
+      └── Integration Patterns
