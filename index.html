@@ -301,13 +301,32 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:
   .cert-action-btn{width:100%;text-align:center}
 }
 
+/* ── Keyboard focus visibility (accessibility) ── */
+a:focus-visible,button:focus-visible,input:focus-visible,
+.quiz-opt:focus-visible,.chapter-card:focus-visible,
+.cert-card:focus-visible,.hero-start-btn:focus-visible{
+  outline:2px solid var(--rust);outline-offset:2px;border-radius:8px
+}
+.sidebar .nav-btn:focus-visible{outline:2px solid var(--rust);outline-offset:-2px;color:#fff}
+.mobile-nav-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.chapter-card{cursor:pointer}
+
+/* ── Respect reduced-motion preference ── */
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important
+  }
+}
+
 </style>
 
 </head>
 <body>
 
 <div class="scroll-progress" id="scroll-prog"></div>
-<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+<div class="overlay" id="overlay" onclick="closeSidebar()" aria-hidden="true"></div>
 
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
@@ -516,7 +535,7 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:
   <div class="topbar-right">
     <button class="topbar-done-btn" id="topbar-done" onclick="markDoneCurrent()">Mark done</button>
     <span class="topbar-badge" id="topbar-badge">0 / 12 lessons</span>
-    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <button class="menu-btn" onclick="toggleSidebar()" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">☰</button>
   </div>
 </header>
 
@@ -534,7 +553,7 @@ body{font-family:var(--sans);background:var(--cream);color:var(--ink);font-size:
 
   <div class="stats-row">
     <div class="stat-box"><span class="stat-val" id="stat-done">0</span><span class="stat-label">Lessons done</span></div>
-    <div class="stat-box"><span class="stat-val">12</span><span class="stat-label">Total lessons</span></div>
+    <div class="stat-box"><span class="stat-val" id="stat-total">34</span><span class="stat-label">Total lessons</span></div>
     <div class="stat-box"><span class="stat-val" id="stat-cert">0</span><span class="stat-label">Certificates</span></div>
   </div>
 
@@ -2583,12 +2602,16 @@ function go(id) {
 }
 
 function toggleSidebar() {
-  document.getElementById('sidebar').classList.toggle('open');
+  const open = document.getElementById('sidebar').classList.toggle('open');
   document.getElementById('overlay').classList.toggle('show');
+  const btn = document.querySelector('.menu-btn');
+  if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('overlay').classList.remove('show');
+  const btn = document.querySelector('.menu-btn');
+  if (btn) btn.setAttribute('aria-expanded', 'false');
 }
 
 // ── Progress ────────────────────────────────────────────────────────────────
@@ -2614,6 +2637,7 @@ function refreshNavDots() {
 function renderHome() {
   const n = getDoneCount();
   const sd = document.getElementById('stat-done'); if(sd) sd.textContent = n;
+  const st = document.getElementById('stat-total'); if(st) st.textContent = ALL.length;
   const certN = [CH1.concat(CH2).every(l=>done[l]), CH3.concat(CH4).every(l=>done[l]), ALL.every(l=>done[l])].filter(Boolean).length;
   const sc = document.getElementById('stat-cert'); if(sc) sc.textContent = certN;
   // Chapter badges
@@ -2633,6 +2657,8 @@ function markDone(id) {
   updateProgress();
   refreshNavDots();
   renderHome();
+  updateMobileNav();
+  updateTopbarDone();
   // Show completion banners
   if (id === '5-2') {
     const banner = document.getElementById('final-completion');
@@ -2821,12 +2847,23 @@ window.addEventListener('scroll', function() {
 }, {passive: true});
 
 // ── KEYBOARD NAVIGATION (desktop) ──────────────────────────────────────────
+// Left/Right move between lessons. Up/Down are intentionally left alone so the
+// keyboard can still scroll long lessons. Modifier combos (e.g. browser back)
+// are ignored.
 document.addEventListener('keydown', function(e) {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+  // Activate div-based cards (chapter/cert) with Enter or Space
+  if ((e.key === 'Enter' || e.key === ' ') &&
+      e.target.classList && e.target.classList.contains('chapter-card')) {
+    e.preventDefault();
+    e.target.click();
+    return;
+  }
+  if (e.key === 'ArrowLeft') {
     e.preventDefault();
     goPrev();
-  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+  } else if (e.key === 'ArrowRight') {
     e.preventDefault();
     goNext();
   }
@@ -2924,6 +2961,54 @@ document.addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeCertModal();
 });
+
+// ── MOBILE SWIPE NAVIGATION ────────────────────────────────────────────────
+// Horizontal swipes move between lessons. Guarded so it never fights with
+// horizontally-scrollable content (tables, flow diagrams) or vertical scroll.
+(function() {
+  var x0 = null, y0 = null, blocked = false;
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length !== 1) { x0 = null; return; }
+    var t = e.touches[0];
+    x0 = t.clientX; y0 = t.clientY;
+    // Ignore swipes that begin inside scrollable UI or the open sidebar/modal
+    blocked = !!(e.target.closest &&
+      e.target.closest('.flow-wrap, .tbl, .sidebar, .cert-modal-overlay, input, textarea'));
+  }, {passive: true});
+  document.addEventListener('touchend', function(e) {
+    if (x0 === null || blocked) { x0 = null; return; }
+    var t = e.changedTouches[0];
+    var dx = t.clientX - x0, dy = t.clientY - y0;
+    x0 = null;
+    // Require a clear, mostly-horizontal swipe
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    if (dx < 0) goNext(); else goPrev();
+  }, {passive: true});
+})();
+
+// ── INITIALISE ON LOAD ─────────────────────────────────────────────────────
+// Restore saved progress and sync every control the moment the page paints.
+// Without this, returning learners saw 0% until they clicked something.
+function init() {
+  restoreDoneBtns();
+  updateProgress();
+  refreshNavDots();
+  renderHome();
+  updateMobileNav();
+  updateTopbarDone();
+  // Make div-based cards reachable and operable by keyboard
+  document.querySelectorAll('.chapter-card').forEach(function(c) {
+    if (!c.hasAttribute('tabindex')) {
+      c.setAttribute('tabindex', '0');
+      c.setAttribute('role', 'button');
+    }
+  });
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
 </script>
 
 <nav class="mobile-nav" id="mobile-nav">
@@ -2936,7 +3021,7 @@ document.addEventListener('keydown', function(e) {
 
 <div class="cert-modal-overlay" id="cert-modal">
   <div class="cert-modal">
-    <button class="cert-modal-close" onclick="closeCertModal()">&times;</button>
+    <button class="cert-modal-close" onclick="closeCertModal()" aria-label="Close certificate">&times;</button>
     <div class="certificate" id="cert-printable">
       <div class="cert-corner tl"></div>
       <div class="cert-corner tr"></div>
