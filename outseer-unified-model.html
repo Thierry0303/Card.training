@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Outseer | Unified Competitor &amp; Expansion Model</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{
+  --bg:#f4f6f9; --surface:#fff; --surface2:#f8fafc;
+  --navy:#0a1628; --navy2:#162440;
+  --teal:#007a74; --teal-l:#00b5ab; --teal-xl:#e6f5f4;
+  --amber:#c27d00; --amber-l:#fff8e6;
+  --red:#c0392b; --red-l:#fdf0ee;
+  --green:#1a6b3a; --green-l:#eaf5ef;
+  --blue:#1d4ed8; --blue-l:#eaf0fe;
+  --purple:#6d28d9; --purple-l:#f2ecfc;
+  --border:#e2e8f0; --border2:#d0dae6;
+  --text:#0f2137; --text2:#4a6080; --text3:#8aa0bc;
+  --font:'Plus Jakarta Sans',sans-serif; --mono:'JetBrains Mono',monospace;
+  --radius:12px; --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13.5px;line-height:1.5}
+
+nav{background:var(--navy);padding:0 28px;height:56px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100}
+.nav-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--teal-l),var(--teal));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;color:#fff}
+.nav-name{font-size:.92rem;font-weight:700;color:#fff}
+.nav-badge{font-size:.68rem;font-weight:600;color:var(--teal-l);background:rgba(0,181,171,.15);border:1px solid rgba(0,181,171,.3);border-radius:100px;padding:3px 10px;letter-spacing:.04em;text-transform:uppercase}
+.nav-btn{background:var(--teal);color:#fff;border:none;padding:8px 16px;border-radius:7px;cursor:pointer;font-weight:700;font-family:var(--font);font-size:.78rem;display:flex;align-items:center;gap:6px;transition:background .15s}
+.nav-btn:hover{background:var(--teal-l)}
+.nav-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8)}
+.nav-btn.ghost:hover{border-color:#fff;color:#fff}
+
+.shell{max-width:1400px;margin:0 auto;padding:28px 28px 80px}
+
+.page-title-block{padding-bottom:16px}
+.page-eyebrow{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:6px}
+.page-title{font-size:clamp(1.3rem,2.2vw,1.7rem);font-weight:800;color:var(--navy);letter-spacing:-.02em}
+.page-sub{font-size:.83rem;color:var(--text2);margin-top:5px;max-width:800px}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:.72rem;color:var(--text2)}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-swatch{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+
+/* ── Mode toggle ── */
+.mode-toggle{display:flex;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;box-shadow:var(--shadow);width:fit-content;margin-top:14px}
+.mode-btn{padding:9px 18px;border:none;background:transparent;border-radius:7px;font-family:var(--font);font-size:.78rem;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s}
+.mode-btn.active{background:var(--navy);color:#fff}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden}
+.panel.supplementary{border-color:rgba(109,40,217,.25)}
+.panel-head{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.panel-head-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--navy);display:flex;align-items:center;gap:8px}
+.panel-head-sub{font-size:.72rem;color:var(--text3)}
+.panel-body{padding:18px 20px}
+.tag{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:100px}
+.tag.excel{background:var(--teal-xl);color:var(--teal)}
+.tag.supp{background:var(--purple-l);color:var(--purple)}
+
+/* ── Input Values grid ── */
+.iv-table{width:100%;min-width:820px;border-collapse:collapse}
+.iv-table th{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);text-align:center;padding:6px 8px;border-bottom:2px solid var(--border)}
+.iv-table th:first-child{text-align:left}
+.iv-table td{padding:6px 8px;border-bottom:1px solid var(--border);text-align:center}
+.iv-table td:first-child{text-align:left;font-weight:600;color:var(--navy);font-size:.76rem}
+.iv-table tr:last-child td{border-bottom:none}
+.iv-hint{font-size:.66rem;color:var(--text3);font-weight:400;display:block;margin-top:1px}
+
+input.cell-input{
+  width:100%;max-width:150px;padding:6px 8px;border:1px solid var(--blue);border-radius:6px;
+  background:var(--blue-l);color:var(--blue);font-family:var(--mono);font-size:.78rem;font-weight:600;
+  text-align:right;outline:none;transition:box-shadow .15s;
+}
+input.cell-input:focus{box-shadow:0 0 0 3px rgba(29,78,216,.15)}
+input.cell-input.small{max-width:90px;padding:5px 7px;font-size:.76rem}
+input.cell-input.formula-input{border-color:var(--amber);background:var(--amber-l);color:var(--amber)}
+input.cell-input.formula-input:focus{box-shadow:0 0 0 3px rgba(194,125,0,.15)}
+input.cell-input.supp-input{border-color:var(--purple);background:var(--purple-l);color:var(--purple)}
+input.cell-input.supp-input:focus{box-shadow:0 0 0 3px rgba(109,40,217,.15)}
+
+/* ── Assumptions table ── */
+.assump-table{width:100%;border-collapse:collapse}
+.assump-table th{font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);text-align:left;padding:8px 10px;border-bottom:2px solid var(--border)}
+.assump-table th.num{text-align:right}
+.assump-table td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.assump-table tr:last-child td{border-bottom:none}
+.assump-table tr:hover td{background:var(--surface2)}
+.a-label{font-weight:600;color:var(--navy);font-size:.78rem;white-space:nowrap}
+.a-def{color:var(--text3);font-size:.7rem;line-height:1.4;max-width:260px}
+.a-source{color:var(--text3);font-size:.68rem;white-space:nowrap}
+.a-gap{font-family:var(--mono);font-size:.78rem;font-weight:700;text-align:right}
+.a-gap.pos{color:var(--green)}
+.a-gap.neg{color:var(--red)}
+
+/* ── Comparison table ── */
+.comp-grid{overflow-x:auto}
+.comp-table{width:100%;border-collapse:collapse;min-width:900px}
+.comp-table th{padding:9px 12px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;text-align:right;border-bottom:2px solid var(--border)}
+.comp-table th.grp{text-align:center;font-size:.72rem;padding:10px 12px}
+.comp-table th:first-child,.comp-table td:first-child{text-align:left}
+.comp-table td{padding:9px 12px;border-bottom:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:.8rem;font-weight:600}
+.comp-table td:first-child{font-family:var(--font);font-weight:700;color:var(--navy);font-size:.8rem}
+.grp-os{background:var(--teal-xl);color:var(--teal)}
+.grp-comp{background:var(--red-l);color:var(--red)}
+.grp-delta{background:var(--surface2);color:var(--navy)}
+.td-os{color:var(--teal)}
+.td-comp{color:var(--red)}
+.td-delta{font-weight:800}
+.td-delta.pos{color:var(--green)}
+.td-delta.neg{color:var(--red)}
+
+/* ── Summary cards ── */
+.summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow)}
+.summary-card.hero{background:var(--navy);border:none}
+.summary-label{font-size:.67rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);margin-bottom:8px}
+.summary-card.hero .summary-label{color:rgba(255,255,255,.45)}
+.summary-val{font-family:var(--mono);font-size:1.35rem;font-weight:800;color:var(--navy)}
+.summary-card.hero .summary-val{color:#fff;font-size:1.55rem}
+.summary-val.pos{color:var(--green)}
+.summary-val.neg{color:var(--red)}
+.summary-sub{font-size:.68rem;color:var(--text3);margin-top:5px}
+.summary-card.hero .summary-sub{color:rgba(255,255,255,.35)}
+
+/* ── Field rows (supplementary panels) ── */
+.field-group{display:flex;flex-direction:column;gap:0}
+.field{padding:12px 0;border-bottom:1px solid var(--border)}
+.field:last-child{border-bottom:none}
+.field-label{font-size:.78rem;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.field-hint{font-size:.7rem;color:var(--text3);margin-bottom:6px;line-height:1.4}
+.field-val{font-family:var(--mono);font-size:.78rem;font-weight:600;color:var(--purple);background:var(--purple-l);border:1px solid rgba(109,40,217,.2);border-radius:6px;padding:2px 8px;white-space:nowrap}
+input.field-val{
+  width:82px;text-align:right;outline:none;cursor:text;transition:box-shadow .15s,border-color .15s;
+}
+input.field-val:focus{box-shadow:0 0 0 3px rgba(109,40,217,.15);border-color:var(--purple)}
+.field-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.section-divider{display:flex;align-items:center;gap:10px;padding:14px 0 8px;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--text3)}
+.section-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Breakdown list ── */
+.bd-item{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.bd-item:last-child{border-bottom:none}
+.bd-item-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.bd-item-text{flex:1;min-width:0}
+.bd-item-name{font-size:.78rem;font-weight:600;color:var(--navy)}
+.bd-item-sub{font-size:.67rem;color:var(--text3);margin-top:1px}
+.bd-item-amt{font-family:var(--mono);font-size:.8rem;font-weight:700;color:var(--purple);white-space:nowrap}
+.bd-total-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0 0;margin-top:6px;border-top:2px solid var(--navy)}
+.bd-total-label{font-size:.8rem;font-weight:700;color:var(--navy)}
+.bd-total-amt{font-family:var(--mono);font-size:1rem;font-weight:800;color:var(--purple)}
+
+/* ── Detection rate bars ── */
+.det-rate-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.det-rate-label{font-size:.75rem;width:80px;flex-shrink:0;font-weight:600}
+.det-rate-bar-track{flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.det-rate-bar-fill{height:100%;border-radius:4px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.det-rate-val{font-family:var(--mono);font-size:.78rem;font-weight:600;width:52px;text-align:right;flex-shrink:0}
+
+.callout{background:var(--purple-l);border:1px solid rgba(109,40,217,.2);border-radius:8px;padding:11px 14px;font-size:.74rem;color:var(--text2);line-height:1.6;margin-bottom:14px}
+.callout strong{color:var(--navy)}
+.callout.amber{background:var(--amber-l);border-color:rgba(194,125,0,.2)}
+
+.footnotes{font-size:.68rem;color:var(--text3);line-height:1.8;padding:14px 20px;border-top:1px solid var(--border);background:var(--surface2)}
+
+@keyframes flashVal{0%{opacity:1}30%{opacity:.35}100%{opacity:1}}
+.val-flash{animation:flashVal .35s ease}
+
+@media(max-width:900px){
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .field-cols{grid-template-columns:1fr}
+  .shell{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">OS</div>
+  <div class="nav-name">Outseer</div>
+  <div class="nav-badge">Unified Model</div>
+  <div style="margin-left:auto;display:flex;gap:10px;">
+    <button class="nav-btn ghost" onclick="randomizeInputs()">🎲 Randomize</button>
+    <button class="nav-btn ghost" onclick="clearAll()">✕ Clear All</button>
+    <button class="nav-btn ghost" onclick="resetFormulas()">↺ Reset Formulas</button>
+    <button class="nav-btn" id="pdf-btn" onclick="generatePDF()">⬇ Download PDF</button>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <div class="page-title-block">
+    <div class="page-eyebrow">Best of Both Worlds — Excel Rigor + Web Tool UX</div>
+    <div class="page-title">Unified Competitor &amp; Expansion Model</div>
+    <div class="page-sub">Combines the exact formulas of both Excel tabs — Manual Competitor Model and Manual Expansion Model — in one switchable comparator, plus two supplementary panels borrowed from the web ROI calculator: a case-based fraud detection cross-check and a channel-level operational savings breakdown. Every field is editable.</div>
+
+    <div class="mode-toggle" id="mode-toggle">
+      <button class="mode-btn active" data-mode="competitor" onclick="setMode('competitor')">vs Competitor</button>
+      <button class="mode-btn" data-mode="expansion" onclick="setMode('expansion')">vs Customer Current (Expansion)</button>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--blue-l);border:1px solid var(--blue)"></div>Direct input</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--amber-l);border:1px solid var(--amber)"></div>Auto-derived from Input Values — editable to override</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--purple-l);border:1px solid var(--purple)"></div>Supplementary (web-tool style) — not summed into the Excel Total</div>
+    </div>
+  </div>
+
+  <!-- ═══ INPUT VALUES ═══ -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-head-title"><span class="tag excel">Excel</span>Input Values — 12 Months</div>
+      <div class="panel-head-sub">Volume &amp; Value · rows C9:J10</div>
+    </div>
+    <div class="panel-body" style="overflow-x:auto;">
+      <table class="iv-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Transactions<span class="iv-hint">total 3DS txn</span></th>
+            <th>Challenged<span class="iv-hint">total challenged</span></th>
+            <th>Failed<span class="iv-hint">total failed challenges</span></th>
+            <th>Declined<span class="iv-hint">volume &amp; value declined</span></th>
+            <th>Fraud Marking<span class="iv-hint">cases marked fraud</span></th>
+            <th>Genuine Marking<span class="iv-hint">cases marked genuine</span></th>
+            <th>Fraud Savings<span class="iv-hint">extrapolated (Competitor mode)</span></th>
+            <th>Chargebacks<span class="iv-hint">missed fraud vol &amp; val</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Volume</td>
+            <td><input class="cell-input int-input" id="C9"  type="number" value="872248744"/></td>
+            <td><input class="cell-input int-input" id="D9"  type="number" value="251670423"/></td>
+            <td><input class="cell-input int-input" id="E9"  type="number" value="60384809"/></td>
+            <td><input class="cell-input int-input" id="F9"  type="number" value="3477417"/></td>
+            <td><input class="cell-input int-input" id="G9"  type="number" value="1449324"/></td>
+            <td><input class="cell-input int-input" id="H9"  type="number" value="1383087"/></td>
+            <td style="color:var(--text3);font-family:var(--mono);font-size:.72rem">—</td>
+            <td><input class="cell-input int-input" id="J9"  type="number" value="150772"/></td>
+          </tr>
+          <tr>
+            <td>Value</td>
+            <td><input class="cell-input int-input" id="C10" type="number" value="94824741091"/></td>
+            <td><input class="cell-input int-input" id="D10" type="number" value="66425851347"/></td>
+            <td><input class="cell-input int-input" id="E10" type="number" value="10973554541"/></td>
+            <td><input class="cell-input int-input" id="F10" type="number" value="2027588441"/></td>
+            <td><input class="cell-input int-input" id="G10" type="number" value="151463957"/></td>
+            <td><input class="cell-input int-input" id="H10" type="number" value="703445465"/></td>
+            <td><input class="cell-input int-input" id="I10" type="number" value="2393238928"/></td>
+            <td><input class="cell-input int-input" id="J10" type="number" value="16404235"/></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="footnotes" id="iv-footnote">
+      In <strong>Competitor</strong> mode, Fraud Savings (E6/H6) is driven by <strong>Fraud Savings extrapolated (I10) × Fraud Prevention Rate</strong>.<br>
+      In <strong>Expansion</strong> mode, it's driven by <strong>raw Fraud Marking Value (G10) × the ratio of Outseer's FPR to the Customer's own FPR</strong> — switch modes above to see the formula change live.
+    </div>
+  </div>
+
+  <!-- ═══ ASSUMPTIONS ═══ -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-head-title"><span class="tag excel">Excel</span>Assumptions</div>
+      <div class="panel-head-sub" id="assump-sub">Outseer · Competitor Benchmark · Gap — rows 15:24</div>
+    </div>
+    <div class="panel-body">
+      <table class="assump-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th class="num" id="th-self">Outseer</th>
+            <th class="num" id="th-other">Competitor Benchmark</th>
+            <th class="num">Gap</th>
+            <th>Definition</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="a-label">Decline Rate — Vol</td>
+            <td><input class="cell-input small formula-input" id="C15" type="number" step="0.0001" value="0"/></td>
+            <td><input class="cell-input small" id="D15" type="number" step="0.0001" value="0.006"/></td>
+            <td class="a-gap" id="E15">—</td>
+            <td class="a-def">Volume of declined transactions / volume of overall transactions</td>
+            <td class="a-source">Outseer Analytics</td>
+          </tr>
+          <tr>
+            <td class="a-label">Decline Rate — Val</td>
+            <td><input class="cell-input small formula-input" id="C16" type="number" step="0.0001" value="0"/></td>
+            <td><input class="cell-input small" id="D16" type="number" step="0.0001" value="0.0272"/></td>
+            <td class="a-gap" id="E16">—</td>
+            <td class="a-def">Value of declined transactions / value of overall transactions</td>
+            <td class="a-source">Outseer Analytics</td>
+          </tr>
+          <tr>
+            <td class="a-label">Challenge Rate — Vol</td>
+            <td><input class="cell-input small" id="C17" type="number" step="0.0001" value="0.2885"/></td>
+            <td><input class="cell-input small" id="D17" type="number" step="0.0001" value="0.42"/></td>
+            <td class="a-gap" id="E17">—</td>
+            <td class="a-def">Volume of challenged transactions / volume of overall transactions</td>
+            <td class="a-source">Outseer Analytics</td>
+          </tr>
+          <tr>
+            <td class="a-label">Challenge Rate — Val</td>
+            <td><input class="cell-input small" id="C18" type="number" step="0.0001" value="0.7005"/></td>
+            <td><input class="cell-input small" id="D18" type="number" step="0.0001" value="0.9255"/></td>
+            <td class="a-gap" id="E18">—</td>
+            <td class="a-def">Value of challenged transactions / value of overall transactions</td>
+            <td class="a-source">Outseer Analytics</td>
+          </tr>
+          <tr>
+            <td class="a-label">Fail Rate — Vol</td>
+            <td><input class="cell-input small formula-input" id="C19" type="number" step="0.0001" value="0"/></td>
+            <td><input class="cell-input small formula-input" id="D19" type="number" step="0.0001" value="0"/></td>
+            <td class="a-gap" id="E19">—</td>
+            <td class="a-def">Volume of failed transactions / volume of challenged transactions</td>
+            <td class="a-source">Outseer Analytics (Calculated)</td>
+          </tr>
+          <tr>
+            <td class="a-label">Fail Rate — Val</td>
+            <td><input class="cell-input small formula-input" id="C20" type="number" step="0.0001" value="0"/></td>
+            <td><input class="cell-input small formula-input" id="D20" type="number" step="0.0001" value="0"/></td>
+            <td class="a-gap" id="E20">—</td>
+            <td class="a-def">Value of failed transactions / value of challenged transactions</td>
+            <td class="a-source">Outseer Analytics (Calculated)</td>
+          </tr>
+          <tr>
+            <td class="a-label">Case Marking Rate</td>
+            <td><input class="cell-input small" id="C21" type="number" step="0.01" value="0.08"/></td>
+            <td><input class="cell-input small" id="D21" type="number" step="0.01" value="0.08"/></td>
+            <td class="a-gap" id="E21">—</td>
+            <td class="a-def">Volume of cases marked / volume of failed challenges and declines</td>
+            <td class="a-source">Outseer Analytics</td>
+          </tr>
+          <tr>
+            <td class="a-label">Interchange Rate</td>
+            <td><input class="cell-input small" id="C22" type="number" step="0.0001" value="0.003"/></td>
+            <td><input class="cell-input small formula-input" id="D22" type="number" step="0.0001" value="0"/></td>
+            <td class="a-gap" id="E22">—</td>
+            <td class="a-def">Blended rate incl. Europe debit, credit, commercial and non-Europe region</td>
+            <td class="a-source">Market Data</td>
+          </tr>
+          <tr>
+            <td class="a-label">Fraud Prevention Rate</td>
+            <td><input class="cell-input small formula-input" id="C23" type="number" step="0.0001" value="0"/></td>
+            <td><input class="cell-input small" id="D23" type="number" step="0.001" value="0.825"/></td>
+            <td class="a-gap" id="E23">—</td>
+            <td class="a-def">Cases marked as fraud / sum of cases marked as fraud plus reported chargebacks</td>
+            <td class="a-source">Customer provided missed + confirmed fraud</td>
+          </tr>
+          <tr>
+            <td class="a-label">Ops Cost per Case</td>
+            <td><input class="cell-input small" id="C24" type="number" step="0.5" value="10"/></td>
+            <td><input class="cell-input small" id="D24" type="number" step="0.5" value="10"/></td>
+            <td class="a-gap" id="E24">—</td>
+            <td class="a-def">Cost to mark case, answer phone call and resolve complaints</td>
+            <td class="a-source">Customer provided / Market Data</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ COMPARISON TABLE ═══ -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-head-title"><span class="tag excel">Excel</span>Comparison — Last 12 Months</div>
+      <div class="panel-head-sub">row 6 — Operational Cost · Interchange Revenue · Fraud Savings</div>
+    </div>
+    <div class="panel-body comp-grid">
+      <table class="comp-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="grp grp-os" colspan="1">Operational Cost</th>
+            <th class="grp grp-os" colspan="1">Interchange Revenue</th>
+            <th class="grp grp-os" colspan="1">Fraud Savings</th>
+            <th class="grp grp-comp" colspan="1">Operational Cost</th>
+            <th class="grp grp-comp" colspan="1">Interchange Revenue</th>
+            <th class="grp grp-comp" colspan="1">Fraud Savings</th>
+            <th class="grp grp-delta" colspan="1">Operational Cost</th>
+            <th class="grp grp-delta" colspan="1">Interchange Revenue</th>
+            <th class="grp grp-delta" colspan="1">Fraud Savings</th>
+          </tr>
+          <tr>
+            <th>Total</th>
+            <th class="td-os" id="th-self-group">OUTSEER</th><th class="td-os"></th><th class="td-os"></th>
+            <th class="td-comp" id="th-other-group" colspan="3">COMPETITION</th>
+            <th class="td-delta">DELTA</th><th class="td-delta"></th><th class="td-delta"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>12 Months</td>
+            <td class="td-os" id="C6">—</td>
+            <td class="td-os" id="D6">—</td>
+            <td class="td-os" id="E6">—</td>
+            <td class="td-comp" id="F6">—</td>
+            <td class="td-comp" id="G6">—</td>
+            <td class="td-comp" id="H6">—</td>
+            <td class="td-delta" id="I6">—</td>
+            <td class="td-delta" id="J6">—</td>
+            <td class="td-delta" id="K6">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══ SUMMARY ═══ -->
+  <div class="panel">
+    <div class="panel-head">
+      <div class="panel-head-title"><span class="tag excel">Excel</span>Summary — Authoritative Total</div>
+      <div class="panel-head-sub">rows M5:N8</div>
+    </div>
+    <div class="panel-body">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <div class="summary-label">Est. Total Fraud Savings</div>
+          <div class="summary-val" id="N5">—</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Est. Interchange Fees</div>
+          <div class="summary-val" id="N6">—</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Est. Additional Operation Cost</div>
+          <div class="summary-val" id="N7">—</div>
+        </div>
+        <div class="summary-card hero">
+          <div class="summary-label">Total — Outseer vs Other</div>
+          <div class="summary-val" id="N8">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SUPPLEMENTARY: FRAUD DETECTION CROSS-CHECK ═══ -->
+  <div class="panel supplementary">
+    <div class="panel-head">
+      <div class="panel-head-title"><span class="tag supp">Web Tool</span>Fraud Detection Cross-Check</div>
+      <div class="panel-head-sub">Case-based before/after view — informational only</div>
+    </div>
+    <div class="panel-body">
+      <div class="callout">
+        <strong>Detection Rate = Confirmed Fraud ÷ (Confirmed Fraud + Missed Fraud)</strong> — a second, case-count-based lens on fraud prevention alongside the Excel model's value-based Fraud Prevention Rate above. Not summed into the Excel Total, to avoid double-counting.
+      </div>
+      <div class="field-cols">
+        <div>
+          <div class="section-divider" style="color:var(--amber)">Before Outseer</div>
+          <div class="field-group">
+            <div class="field">
+              <div class="field-label">Confirmed Fraud Cases <input class="field-val" id="v-conf-before" value="1,200"/></div>
+              <input type="range" min="0" max="50000" step="50" value="1200" id="fd-conf-before" oninput="calcAll()"/>
+            </div>
+            <div class="field">
+              <div class="field-label">Missed Fraud (chargeback file) <input class="field-val" id="v-missed-before" value="850"/></div>
+              <input type="range" min="0" max="50000" step="50" value="850" id="fd-missed-before" oninput="calcAll()"/>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="section-divider" style="color:var(--teal)">With Outseer</div>
+          <div class="field-group">
+            <div class="field">
+              <div class="field-label">Confirmed Fraud Cases <input class="field-val" id="v-conf-after" value="1,650"/></div>
+              <input type="range" min="0" max="50000" step="50" value="1650" id="fd-conf-after" oninput="calcAll()"/>
+            </div>
+            <div class="field">
+              <div class="field-label">Missed Fraud (chargeback file) <input class="field-val" id="v-missed-after" value="200"/></div>
+              <input type="range" min="0" max="50000" step="50" value="200" id="fd-missed-after" oninput="calcAll()"/>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="field" style="max-width:420px">
+        <div class="field-label">Average Fraud Loss per Missed Transaction <input class="field-val" id="v-fraud-loss" value="£72"/></div>
+        <input type="range" min="10" max="500" step="5" value="72" id="fd-fraud-loss" oninput="calcAll()"/>
+      </div>
+      <div style="margin-top:14px">
+        <div class="det-rate-row">
+          <div class="det-rate-label" style="color:var(--amber)">Before</div>
+          <div class="det-rate-bar-track"><div class="det-rate-bar-fill" id="det-bar-before" style="background:var(--amber);width:0%"></div></div>
+          <div class="det-rate-val" style="color:var(--amber)" id="det-rate-before">—</div>
+        </div>
+        <div class="det-rate-row">
+          <div class="det-rate-label" style="color:var(--teal)">Outseer</div>
+          <div class="det-rate-bar-track"><div class="det-rate-bar-fill" id="det-bar-after" style="background:var(--teal);width:0%"></div></div>
+          <div class="det-rate-val" style="color:var(--teal)" id="det-rate-after">—</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;font-size:.75rem">
+        <div><div style="color:var(--text3)">Missed fraud avoided / yr</div><div style="font-family:var(--mono);font-weight:700;color:var(--navy)" id="fd-avoided">—</div></div>
+        <div style="text-align:right"><div style="color:var(--text3)">Value of loss avoided</div><div style="font-family:var(--mono);font-weight:700;color:var(--purple)" id="fd-loss-avoided">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ SUPPLEMENTARY: CHANNEL-LEVEL OPERATIONAL SAVINGS ═══ -->
+  <div class="panel supplementary">
+    <div class="panel-head">
+      <div class="panel-head-title"><span class="tag supp">Web Tool</span>Channel-Level Operational Savings</div>
+      <div class="panel-head-sub">Driven by the Excel funnel's own Challenge Rate shift — informational only</div>
+    </div>
+    <div class="panel-body">
+      <div class="callout">
+        Shifted volume is derived directly from the Excel funnel above: <strong>(Other Challenge Rate Vol − Outseer Challenge Rate Vol) × Total Transaction Volume</strong>. This reuses your actual funnel data instead of a separate slider, then applies the web tool's OTP/OOB channel-cost model to it. Shown separately from the Excel Total to avoid double-counting the Interchange Revenue line above.
+      </div>
+      <div class="field-cols">
+        <div>
+          <div class="field">
+            <div class="field-label">OTP (SMS) Share of Challenge <input class="field-val" id="v-otp-split" value="70%"/></div>
+            <input type="range" min="0" max="100" step="1" value="70" id="ch-otp-split" oninput="calcAll()"/>
+          </div>
+          <div class="field">
+            <div class="field-label">OTP / SMS Cost per Challenge <input class="field-val" id="v-sms-cost" value="£0.06"/></div>
+            <input type="range" min="0.01" max="0.50" step="0.01" value="0.06" id="ch-sms-cost" oninput="calcAll()"/>
+          </div>
+          <div class="field">
+            <div class="field-label">OTP Abandonment Rate <input class="field-val" id="v-otp-abandon" value="18%"/></div>
+            <input type="range" min="0" max="50" step="1" value="18" id="ch-otp-abandon" oninput="calcAll()"/>
+          </div>
+          <div class="field">
+            <div class="field-label">OOB Push Abandonment Rate <input class="field-val" id="v-oob-abandon" value="8%"/></div>
+            <input type="range" min="0" max="50" step="1" value="8" id="ch-oob-abandon" oninput="calcAll()"/>
+          </div>
+        </div>
+        <div>
+          <div class="field">
+            <div class="field-label">Average Order Value <input class="field-val" id="v-aov" value="£85"/></div>
+            <input type="range" min="10" max="500" step="5" value="85" id="ch-aov" oninput="calcAll()"/>
+          </div>
+          <div class="field">
+            <div class="field-label">Fraud Claim Rate on Challenged Txns <input class="field-val" id="v-dispute-rate" value="0.8%"/></div>
+            <input type="range" min="0.1" max="5.0" step="0.1" value="0.8" id="ch-dispute-rate" oninput="calcAll()"/>
+          </div>
+          <div class="field">
+            <div class="field-label">Processing Cost per Fraud Claim <input class="field-val" id="v-dispute-cost" value="£35"/></div>
+            <input type="range" min="5" max="120" step="1" value="35" id="ch-dispute-cost" oninput="calcAll()"/>
+          </div>
+          <div class="field">
+            <div class="field-label">Shifted Volume (from funnel) <span class="field-val" id="v-shifted">—</span></div>
+            <div class="field-hint">Read-only — recalculates from the Excel Challenge Rate Vol gap above</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:8px">
+        <div class="bd-item"><div class="bd-item-icon" style="background:#fff8e6">📱</div><div class="bd-item-text"><div class="bd-item-name">OTP / SMS Delivery Fees</div><div class="bd-item-sub" id="bd-sub-sms">—</div></div><div class="bd-item-amt" id="bd-sms">—</div></div>
+        <div class="bd-item"><div class="bd-item-icon" style="background:#fdf0ee">⚖️</div><div class="bd-item-text"><div class="bd-item-name">Fraud Claim Processing</div><div class="bd-item-sub" id="bd-sub-dispute">—</div></div><div class="bd-item-amt" id="bd-dispute">—</div></div>
+        <div class="bd-item"><div class="bd-item-icon" style="background:var(--teal-xl)">🛒</div><div class="bd-item-text"><div class="bd-item-name">Recovered Transaction Value</div><div class="bd-item-sub" id="bd-sub-abandon">—</div></div><div class="bd-item-amt" id="bd-abandon">—</div></div>
+        <div class="bd-total-row"><div class="bd-total-label">Total Channel-Level Saving</div><div class="bd-total-amt" id="bd-total">—</div></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end shell -->
+
+<script>
+// ═══ Formatters ═══
+function fmtGBP(n){
+  if(!isFinite(n)) return '—';
+  const s = n<0 ? '-' : '';
+  const a = Math.abs(n);
+  if(a>=1e6) return s+'£'+(a/1e6).toFixed(2)+'M';
+  if(a>=1e3) return s+'£'+Math.round(a).toLocaleString('en-GB');
+  return s+'£'+a.toFixed(2);
+}
+function fmtNum(n){
+  if(!isFinite(n)) return '—';
+  const a=Math.abs(n);
+  if(a>=1e6) return (n/1e6).toFixed(1)+'M';
+  if(a>=1e3) return (n/1e3).toFixed(0)+'K';
+  return Math.round(n).toLocaleString('en-GB');
+}
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function setText(id,val){
+  const el=document.getElementById(id);
+  if(el.tagName === 'INPUT'){ el.value = val; }
+  else { el.textContent = val; }
+  el.classList.remove('val-flash'); void el.offsetWidth; el.classList.add('val-flash');
+}
+
+// ═══ Assumption schema — the heart of the dynamic model ═══
+// For each mode, every assumption cell is declared as either:
+//   • a live FORMULA (amber) auto-derived from the Input Values grid, or
+//   • an editable benchmark INPUT (blue) with a mode-specific default.
+// This mirrors the two Excel tabs exactly. Changing any Input Value above
+// now flows straight into the derived assumption cells, the comparison
+// table and the summary — nothing is frozen.
+const FORMULA = fn  => ({type:'formula', fn});
+const INPUT   = def => ({type:'input',   def});
+
+const SCHEMA = {
+  // ── vs Competitor tab: C = Outseer (derived) · D = Competitor benchmark ──
+  competitor: {
+    C15:FORMULA(v=>v.F9/v.C9),   C16:FORMULA(v=>v.F10/v.C10),
+    C17:FORMULA(v=>v.D9/v.C9),   C18:FORMULA(v=>v.D10/v.C10),
+    C19:FORMULA(v=>v.E9/v.D9),   C20:FORMULA(v=>v.E10/v.D10),
+    C21:INPUT(0.08),             C22:INPUT(0.003),
+    C23:FORMULA(v=>v.G10/(v.G10+v.J10)), C24:INPUT(10),
+    D15:INPUT(0.006),  D16:INPUT(0.0272), D17:INPUT(0.42),  D18:INPUT(0.9255),
+    D19:FORMULA(v=>v.C19), D20:FORMULA(v=>v.C20), D21:INPUT(0.08),
+    D22:FORMULA(v=>v.C22), D23:INPUT(0.825),  D24:INPUT(10),
+  },
+  // ── vs Customer Current tab: C = Customer actual (derived) · D = Outseer benchmark ──
+  expansion: {
+    C15:FORMULA(v=>v.F9/v.C9),   C16:FORMULA(v=>v.F10/v.C10),
+    C17:FORMULA(v=>v.D9/v.C9),   C18:FORMULA(v=>v.D10/v.C10),
+    C19:FORMULA(v=>v.E9/v.D9),   C20:FORMULA(v=>v.E10/v.D10),
+    C21:INPUT(0.238),            C22:INPUT(0.005),
+    C23:FORMULA(v=>v.G10/(v.G10+v.J10)), C24:INPUT(10),
+    D15:INPUT(0.0040), D16:INPUT(0.0214), D17:INPUT(0.09),  D18:INPUT(0.233),
+    D19:INPUT(0.2399), D20:INPUT(0.1652), D21:INPUT(0.238),
+    D22:INPUT(0.005),  D23:INPUT(0.9023), D24:INPUT(10),
+  },
+};
+
+// ═══ Mode toggle ═══
+let mode = 'competitor'; // 'competitor' | 'expansion'
+function setMode(m){
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.toggle('active', b.dataset.mode===m));
+  const selfLabel  = m==='competitor' ? 'Outseer'  : 'Customer Current';
+  const otherLabel = m==='competitor' ? 'Competitor Benchmark' : 'Outseer + FAdv';
+  document.getElementById('th-self').textContent  = selfLabel;
+  document.getElementById('th-other').textContent = otherLabel;
+  document.getElementById('th-self-group').textContent  = m==='competitor' ? 'OUTSEER' : 'CUSTOMER';
+  document.getElementById('th-other-group').textContent = m==='competitor' ? 'COMPETITION' : 'OUTSEER + FADV';
+  document.getElementById('assump-sub').textContent = `${selfLabel} · ${otherLabel} · Gap — rows 15:24`;
+  applyMode(m);   // repaint formula/input styling + reset benchmark defaults for this mode
+  calcAll();
+}
+
+// ═══ Formula-cell override tracking (Excel section) ═══
+// A formula (amber) cell shows a live derived value, but the user can still
+// type over it — doing so "pins" it as a manual override until Reset Formulas.
+const overrides = new Set();
+function formulaVal(id, computed){
+  const el = document.getElementById(id);
+  if(overrides.has(id)) return parseFloat(el.value);
+  // Rates are small; show up to 4 dp so decline/fail rates don't collapse to
+  // 0.00, while still returning full precision to the downstream formulas.
+  el.value = isFinite(computed) ? parseFloat(computed.toFixed(4)) : 0;
+  return computed;
+}
+// Paint each assumption cell's styling for the active mode, and (re)seed the
+// benchmark INPUT cells with that mode's defaults. Formula cells are left for
+// calcExcel to fill. Clears any manual overrides so the model is consistent.
+function applyMode(m){
+  overrides.clear();
+  const schema = SCHEMA[m];
+  Object.entries(schema).forEach(([id, def])=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(def.type==='formula'){
+      el.classList.add('formula-input');
+    } else {
+      el.classList.remove('formula-input');
+      el.value = def.def;
+    }
+  });
+}
+function resetFormulas(){
+  overrides.clear();
+  calcAll();
+}
+function randomizeInputs(){
+  const rand = (min,max) => min + Math.random()*(max-min);
+  // Round to a small number of significant figures so numbers read clean
+  // (e.g. 50,000,000 or 47,000,000) instead of an exact, over-precise integer.
+  const niceRound = (n, sig=2) => {
+    if(!n || n===0) return 0;
+    const mag = Math.pow(10, Math.floor(Math.log10(Math.abs(n))) - (sig-1));
+    return Math.round(n/mag)*mag;
+  };
+
+  // ── Randomise the Input Values — 12 Months grid only ──
+  // Everything else (the assumption column, comparison table and summary) is
+  // derived from these figures by calcAll(), so we deliberately touch nothing
+  // below this grid — the model stays internally consistent by construction.
+  const C9 = niceRound(rand(20_000_000, 80_000_000), 2);   // total 3DS txn volume
+  const challengeShare = rand(0.15, 0.45);
+  const D9 = niceRound(C9*challengeShare, 2);               // challenged
+  const failShare = rand(0.15, 0.32);
+  const E9 = niceRound(D9*failShare, 2);                    // failed challenges
+  const declineShare = rand(0.002, 0.012);
+  const F9 = niceRound(C9*declineShare, 2);                 // declined
+  const fraudMarkShare = rand(0.0006, 0.0025);
+  const G9 = niceRound(C9*fraudMarkShare, 2);               // marked fraud
+  const genuineMarkShare = rand(0.0006, 0.0022);
+  const H9 = niceRound(C9*genuineMarkShare, 2);             // marked genuine
+  const chargebackShare = rand(0.00008, 0.0003);
+  const J9 = niceRound(C9*chargebackShare, 2);              // missed fraud / chargebacks
+
+  // Average order value per category — varied so Values aren't a flat multiple of Volumes
+  const aov = x => niceRound(x*rand(75, 130), 2);
+  const C10 = aov(C9), D10 = aov(D9), E10 = aov(E9), F10 = aov(F9);
+  const G10 = aov(G9), H10 = aov(H9), J10 = aov(J9);
+  const I10 = niceRound(G10*rand(12, 22), 2); // fraud value extrapolated across all cases
+
+  const set = (id,x) => { document.getElementById(id).value = x; };
+  set('C9',C9); set('D9',D9); set('E9',E9); set('F9',F9); set('G9',G9); set('H9',H9); set('J9',J9);
+  set('C10',C10); set('D10',D10); set('E10',E10); set('F10',F10); set('G10',G10); set('H10',H10); set('I10',I10); set('J10',J10);
+
+  overrides.clear();   // drop any manual pins so the fresh inputs flow through
+  calcAll();
+}
+function clearAllFields(){
+  overrides.clear();
+  document.querySelectorAll('input.cell-input').forEach(inp=>{ inp.value = 0; });
+  document.querySelectorAll('input[type=range]').forEach(inp=>{ inp.value = inp.min || 0; });
+}
+function clearAll(){
+  if(!confirm('Clear every field back to zero? This cannot be undone.')) return;
+  clearAllFields();
+  calcAll();
+}
+
+// ═══ Main calc — Excel model (both modes) + supplementary panels ═══
+function calcExcel(){
+  // ── 1. Read the Input Values grid ──
+  const v = {};
+  ['C9','D9','E9','F9','G9','H9','J9','C10','D10','E10','F10','G10','H10','I10','J10']
+    .forEach(id=>{ v[id] = num(id); });
+
+  // ── 2. Resolve every assumption cell from the active mode's schema ──
+  // Formula cells (unless manually overridden) derive live from the inputs
+  // above; input cells are read straight from their box. Schema order puts the
+  // derived C-column first, so D-column mirrors (e.g. D19=C19) resolve cleanly.
+  const schema = SCHEMA[mode];
+  Object.entries(schema).forEach(([id, def])=>{
+    if(def.type==='formula'){
+      const computed = def.fn(v);
+      v[id] = overrides.has(id) ? num(id) : computed;
+      formulaVal(id, computed);            // paints the amber box
+    } else {
+      v[id] = num(id);                     // editable benchmark input
+    }
+  });
+
+  // ── 3. Gap column = (benchmark − self) / self ──
+  const gap = (comp,os) => (comp-os)/os;
+  const gapPairs = [
+    ['E15','D15','C15'],['E16','D16','C16'],['E17','D17','C17'],['E18','D18','C18'],
+    ['E19','D19','C19'],['E20','D20','C20'],['E21','D21','C21'],['E22','D22','C22'],
+    ['E23','D23','C23'],['E24','D24','C24'],
+  ];
+  gapPairs.forEach(([id,comp,os])=>{
+    const g = gap(v[comp], v[os]);
+    const el = document.getElementById(id);
+    el.textContent = isFinite(g) ? (g>=0?'+':'')+(g*100).toFixed(1)+'%' : '—';
+    el.className = 'a-gap ' + (g>=0 ? 'pos':'neg');
+  });
+
+  // ── 4. Comparison row 6 — identical structure both tabs (Excel C6:H6) ──
+  const C6 = (v.C9*v.C15 + (v.C9*v.C17*v.C19)) * (v.C24*v.C21);
+  const D6 = (v.C10*v.C22) - (((v.C10*v.C16)*v.C22) + ((v.C10*v.C18*v.C20)*v.C22));
+  const F6 = (v.C9*v.D15 + (v.C9*v.D17*v.D19)) * (v.D24*v.D21);
+  const G6 = (v.C10*v.D22) - (((v.C10*v.D16)*v.D22) + ((v.C10*v.D18*v.D20)*v.D22));
+
+  // Fraud Savings + delta signs differ by tab (Excel E6/H6 and I6:K6).
+  let E6, H6, I6, J6, K6;
+  if(mode==='competitor'){
+    E6 = v.I10*v.C23;                       // Outseer:   confirmed fraud × FPR
+    H6 = ((v.I10/997)*1000)*v.D23;          // Competitor: extrapolated × benchmark FPR
+    I6 = F6-C6; J6 = D6-G6; K6 = E6-H6;     // delta = competition − Outseer
+  } else {
+    E6 = v.G10;                             // Customer: raw fraud-marking value
+    H6 = (v.D23/v.C23)*E6;                  // Outseer:  customer value × FPR uplift ratio
+    I6 = C6-F6; J6 = G6-D6; K6 = H6-E6;     // delta = customer − Outseer
+  }
+
+  setText('C6', fmtGBP(C6)); setText('D6', fmtGBP(D6)); setText('E6', fmtGBP(E6));
+  setText('F6', fmtGBP(F6)); setText('G6', fmtGBP(G6)); setText('H6', fmtGBP(H6));
+  const setDelta=(id,val)=>{ const el=document.getElementById(id); el.textContent=fmtGBP(val); el.className='td-delta '+(val>=0?'pos':'neg'); };
+  setDelta('I6',I6); setDelta('J6',J6); setDelta('K6',K6);
+
+  // ── 5. Authoritative summary (Excel M5:N8) ──
+  const N5=K6, N6=J6, N7=I6, N8=N5+N6+N7;
+  setText('N5', fmtGBP(N5)); setText('N6', fmtGBP(N6)); setText('N7', fmtGBP(N7)); setText('N8', fmtGBP(N8));
+  document.getElementById('N7').className = 'summary-val '+(N7>=0?'pos':'neg');
+
+  return { C9:v.C9, C17:v.C17, D17:v.D17 };
+}
+
+function calcFraudCrossCheck(){
+  const confBefore=num('fd-conf-before'), missedBefore=num('fd-missed-before');
+  const confAfter=num('fd-conf-after'), missedAfter=num('fd-missed-after');
+  const fraudLoss=num('fd-fraud-loss');
+
+  setText('v-conf-before', Math.round(confBefore).toLocaleString('en-GB'));
+  setText('v-missed-before', Math.round(missedBefore).toLocaleString('en-GB'));
+  setText('v-conf-after', Math.round(confAfter).toLocaleString('en-GB'));
+  setText('v-missed-after', Math.round(missedAfter).toLocaleString('en-GB'));
+  setText('v-fraud-loss', '£'+fraudLoss.toFixed(0));
+
+  const totalBefore = confBefore+missedBefore, totalAfter = confAfter+missedAfter;
+  const detBefore = totalBefore>0 ? confBefore/totalBefore : 0;
+  const detAfter = totalAfter>0 ? confAfter/totalAfter : 0;
+
+  document.getElementById('det-bar-before').style.width = (detBefore*100).toFixed(1)+'%';
+  document.getElementById('det-bar-after').style.width = (detAfter*100).toFixed(1)+'%';
+  setText('det-rate-before', (detBefore*100).toFixed(1)+'%');
+  setText('det-rate-after', (detAfter*100).toFixed(1)+'%');
+
+  const avoided = Math.max(0, missedBefore-missedAfter);
+  setText('fd-avoided', fmtNum(avoided)+' cases/yr');
+  setText('fd-loss-avoided', fmtGBP(avoided*fraudLoss));
+}
+
+function calcChannelSavings(excelVars){
+  const otpSplit=num('ch-otp-split')/100, oobSplit=1-otpSplit;
+  const smsCost=num('ch-sms-cost');
+  const otpAbandon=num('ch-otp-abandon')/100, oobAbandon=num('ch-oob-abandon')/100;
+  const aov=num('ch-aov');
+  const disputeRate=num('ch-dispute-rate')/100;
+  const disputeCost=num('ch-dispute-cost');
+
+  setText('v-otp-split', Math.round(otpSplit*100)+'%');
+  setText('v-sms-cost', '£'+smsCost.toFixed(2));
+  setText('v-otp-abandon', Math.round(otpAbandon*100)+'%');
+  setText('v-oob-abandon', Math.round(oobAbandon*100)+'%');
+  setText('v-aov', '£'+aov.toFixed(0));
+  setText('v-dispute-rate', (disputeRate*100).toFixed(1)+'%');
+  setText('v-dispute-cost', '£'+disputeCost.toFixed(0));
+
+  // Shifted volume derived from the Excel funnel's own Challenge Rate gap
+  // (absolute, so it reads sensibly whichever side challenges more).
+  const shifted = Math.max(0, Math.abs(excelVars.D17 - excelVars.C17) * excelVars.C9);
+  setText('v-shifted', fmtNum(shifted)+' txns/yr');
+
+  const otpTxns = shifted*otpSplit;
+  const smsSaved = otpTxns*smsCost;
+  const blendedAbandon = otpSplit*otpAbandon + oobSplit*oobAbandon;
+  const recoveredTxns = shifted*blendedAbandon;
+  const recoveredValue = recoveredTxns*aov;
+  const disputeSaved = shifted*disputeRate*disputeCost;
+  const total = smsSaved + disputeSaved + recoveredValue;
+
+  setText('bd-sms', fmtGBP(smsSaved));
+  document.getElementById('bd-sub-sms').textContent = `${fmtNum(Math.round(otpTxns))} OTP txns × £${smsCost.toFixed(2)}`;
+  setText('bd-dispute', fmtGBP(disputeSaved));
+  document.getElementById('bd-sub-dispute').textContent = `${fmtNum(Math.round(shifted*disputeRate))} claims avoided × £${disputeCost.toFixed(0)}`;
+  setText('bd-abandon', fmtGBP(recoveredValue));
+  document.getElementById('bd-sub-abandon').textContent = `${fmtNum(Math.round(recoveredTxns))} recovered txns × £${aov.toFixed(0)}`;
+  setText('bd-total', fmtGBP(total));
+}
+
+function calcAll(){
+  const excelVars = calcExcel();
+  calcFraudCrossCheck();
+  calcChannelSavings(excelVars);
+}
+
+document.querySelectorAll('input.cell-input').forEach(inp=>{
+  inp.addEventListener('input', ()=>{
+    if(inp.classList.contains('formula-input')) overrides.add(inp.id);
+    calcAll();
+  });
+});
+// Input Values grid (Transactions/Value) always settles on a clean whole number,
+// same rounded-on-commit behaviour as the slider boxes above.
+document.querySelectorAll('input.int-input').forEach(inp=>{
+  inp.addEventListener('change', ()=>{
+    const v = parseFloat(inp.value);
+    if(!isNaN(v)) inp.value = Math.round(v);
+    calcAll();
+  });
+});
+document.querySelectorAll('input[type=range]').forEach(inp=>{
+  inp.addEventListener('input', calcAll);
+});
+
+// ═══ Editable value boxes next to each slider ═══
+// Typing a number into the box (then Enter/blur) updates the linked slider
+// and recalculates, so every slider can be set precisely as well as dragged.
+const sliderBoxLinks = [
+  { box:'v-conf-before',   slider:'fd-conf-before' },
+  { box:'v-missed-before', slider:'fd-missed-before' },
+  { box:'v-conf-after',    slider:'fd-conf-after' },
+  { box:'v-missed-after',  slider:'fd-missed-after' },
+  { box:'v-fraud-loss',    slider:'fd-fraud-loss' },
+  { box:'v-otp-split',     slider:'ch-otp-split' },
+  { box:'v-sms-cost',      slider:'ch-sms-cost' },
+  { box:'v-otp-abandon',   slider:'ch-otp-abandon' },
+  { box:'v-oob-abandon',   slider:'ch-oob-abandon' },
+  { box:'v-aov',           slider:'ch-aov' },
+  { box:'v-dispute-rate',  slider:'ch-dispute-rate' },
+  { box:'v-dispute-cost',  slider:'ch-dispute-cost' },
+];
+function parseBoxNum(str){
+  if(typeof str !== 'string') return NaN;
+  return parseFloat(str.replace(/[£,%\s]/g,''));
+}
+sliderBoxLinks.forEach(({box, slider})=>{
+  const boxEl = document.getElementById(box);
+  const sliderEl = document.getElementById(slider);
+  if(!boxEl || !sliderEl) return;
+  const commit = ()=>{
+    let v = parseBoxNum(boxEl.value);
+    const min = parseFloat(sliderEl.min), max = parseFloat(sliderEl.max);
+    const step = parseFloat(sliderEl.step) || 1;
+    if(isNaN(v)) v = parseFloat(sliderEl.value);
+    v = Math.min(max, Math.max(min, v));
+    // snap to the slider's step so the box always settles on a clean, rounded number
+    v = Math.round(v/step)*step;
+    const decimals = (step.toString().split('.')[1] || '').length;
+    v = parseFloat(v.toFixed(decimals));
+    sliderEl.value = v;
+    calcAll();
+  };
+  boxEl.addEventListener('change', commit);
+  boxEl.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); boxEl.blur(); } });
+});
+
+// ═══ Boot ═══
+// Paint the initial mode's assumption styling + benchmark defaults, then fill
+// the Input Values grid with randomised data so the model opens fully populated.
+applyMode(mode);
+randomizeInputs();   // calls calcAll() internally
+function generatePDF(){
+  const btn = document.getElementById('pdf-btn');
+  const original = btn.textContent;
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+
+  // If the page is scrolled when this runs, html2canvas captures from that
+  // scroll offset — which is what produced the huge blank gap at the top of
+  // the PDF. Scroll to the very top first so capture starts at the real top.
+  window.scrollTo(0, 0);
+
+  const element = document.querySelector('.shell');
+  const opt = {
+    margin: [8,6,8,6],
+    filename: 'Outseer_Unified_Model_' + mode + '.pdf',
+    image: { type:'jpeg', quality:0.98 },
+    html2canvas: { scale:1.5, useCORS:true, letterRendering:true, scrollX:0, scrollY:0, windowWidth:element.scrollWidth },
+    jsPDF: { unit:'mm', format:'a4', orientation:'landscape' },
+    // 'legacy' slices strictly by pixel height; the default 'css' mode was
+    // pushing any panel taller than the remaining page onto a fresh page,
+    // leaving a large blank gap behind it — this avoids that entirely.
+    pagebreak: { mode:['legacy'] }
+  };
+
+  // Give the browser a tick to finish the scroll before html2canvas snapshots.
+  setTimeout(()=>{
+    html2pdf().set(opt).from(element).save()
+      .then(()=>{ btn.textContent = original; btn.disabled = false; })
+      .catch(err=>{
+        console.error('PDF generation error:', err);
+        btn.textContent = original; btn.disabled = false;
+        alert('Could not generate the PDF. Please try again.');
+      });
+  }, 50);
+}
+</script>
+</body>
+</html>
