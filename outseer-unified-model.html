@@ -6,6 +6,7 @@
 <title>Outseer | Unified Competitor &amp; Expansion Model</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pptxgenjs/3.12.0/pptxgen.bundle.js"></script>
 <style>
 :root{
   --bg:#f4f6f9; --surface:#fff; --surface2:#f8fafc;
@@ -184,6 +185,7 @@ input.field-val:focus{box-shadow:0 0 0 3px rgba(109,40,217,.15);border-color:var
     <button class="nav-btn ghost" onclick="randomizeInputs()">🎲 Randomize</button>
     <button class="nav-btn ghost" onclick="clearAll()">✕ Clear All</button>
     <button class="nav-btn ghost" onclick="resetFormulas()">↺ Reset Formulas</button>
+    <button class="nav-btn" id="ppt-btn" onclick="generatePPT()">⬇ Download PPT</button>
     <button class="nav-btn" id="pdf-btn" onclick="generatePDF()">⬇ Download PDF</button>
   </div>
 </nav>
@@ -956,6 +958,164 @@ function generatePDF(){
         alert('Could not generate the PDF. Please try again.');
       });
   }, 50);
+}
+
+// ═══ Export a QBR-ready PowerPoint deck ═══
+// Builds a 4-slide deck straight from the live model values (whatever mode /
+// inputs are on screen), so the value model can be dropped into a QBR.
+function generatePPT(){
+  if(typeof PptxGenJS === 'undefined'){
+    alert('The PowerPoint library is still loading — please try again in a moment.');
+    return;
+  }
+  const btn = document.getElementById('ppt-btn');
+  const original = btn.textContent;
+  btn.textContent = 'Generating…';
+  btn.disabled = true;
+
+  try{
+    // ── Brand palette (hex without #) ──
+    const NAVY='0A1628', NAVY2='162440', TEAL='007A74', TEAL_XL='E6F5F4',
+          RED='C0392B', GREEN='1A6B3A', INK='0F2137', GREY='4A6080',
+          LINE='D0DAE6', PAPER='FFFFFF', WASH='F8FAFC', WHITE='FFFFFF';
+
+    // ── Read the model as the user currently sees it ──
+    const txt = id => (document.getElementById(id).textContent || '').trim();
+    const box = id => document.getElementById(id).value;
+    const isNeg = s => /^-|^\(|−/.test((s||'').trim()); // '-' prefix from fmtGBP
+    const deltaColor = s => isNeg(s) ? RED : GREEN;
+
+    const selfLabel  = mode==='competitor' ? 'Outseer' : 'Customer Current';
+    const otherLabel = mode==='competitor' ? 'Competitor Benchmark' : 'Outseer + FAdv';
+    const modeTitle  = mode==='competitor' ? 'Outseer vs Competitor' : 'Customer Current vs Outseer + FAdv';
+    const today = new Date().toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'});
+
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_WIDE';           // 13.33 × 7.5 in
+    pptx.author = 'Outseer Unified Model';
+    pptx.company = 'Outseer';
+    pptx.title  = 'Outseer Value Model — QBR';
+    const W = 13.33;
+
+    // Shared slide header (title + subtitle + teal rule)
+    const slideHeader = (s, title, sub) => {
+      s.addText(title, { x:0.6, y:0.45, w:12.2, h:0.6, fontSize:24, bold:true, color:NAVY });
+      if(sub) s.addText(sub, { x:0.62, y:1.05, w:12.2, h:0.4, fontSize:13, color:GREY });
+      s.addShape(pptx.ShapeType.rect, { x:0.62, y:1.5, w:1.6, h:0.06, fill:{color:TEAL}, line:{type:'none'} });
+    };
+
+    // ─────────── Slide 1 · Title ───────────
+    let s = pptx.addSlide();
+    s.background = { color: NAVY };
+    s.addShape(pptx.ShapeType.rect, { x:0, y:6.9, w:W, h:0.6, fill:{color:TEAL} });
+    s.addText('OS', { x:0.6, y:0.55, w:1.0, h:0.7, fontSize:22, bold:true, color:WHITE,
+      align:'center', valign:'middle', fill:{color:TEAL}, rectRadius:0.06 });
+    s.addText('Outseer  ·  Value Model', { x:1.7, y:0.6, w:8, h:0.6, fontSize:15, color:'8AA0BC', bold:true });
+    s.addText('12-Month Value Assessment', { x:0.6, y:2.5, w:12, h:1.1, fontSize:40, bold:true, color:WHITE });
+    s.addText(modeTitle, { x:0.62, y:3.7, w:12, h:0.6, fontSize:20, color:'00B5AB', bold:true });
+    s.addText('Prepared for Quarterly Business Review  ·  ' + today,
+      { x:0.62, y:4.5, w:12, h:0.5, fontSize:13, color:'8AA0BC' });
+
+    // ─────────── Slide 2 · Executive summary ───────────
+    s = pptx.addSlide();
+    s.background = { color: WASH };
+    slideHeader(s, 'Executive Summary', '12-Month value — ' + modeTitle);
+
+    // Hero total
+    s.addShape(pptx.ShapeType.rect, { x:0.6, y:1.5, w:5.1, h:4.7, fill:{color:NAVY}, rectRadius:0.1, line:{type:'none'} });
+    s.addText('TOTAL 12-MONTH VALUE', { x:0.85, y:1.9, w:4.6, h:0.4, fontSize:12, color:'8AA0BC', charSpacing:1, bold:true });
+    s.addText(txt('N8'), { x:0.85, y:2.6, w:4.6, h:1.4, fontSize:48, bold:true, color:WHITE, align:'left' });
+    s.addText(selfLabel + ' vs ' + otherLabel, { x:0.85, y:4.2, w:4.6, h:0.5, fontSize:13, color:'8AA0BC' });
+    s.addText('Est. Total Fraud Savings + Interchange Fees + Additional Operation Cost',
+      { x:0.85, y:5.1, w:4.6, h:0.9, fontSize:11, color:'6E829E', italic:true });
+
+    // Three KPI cards
+    const kpis = [
+      ['Est. Total Fraud Savings', txt('N5'), TEAL],
+      ['Est. Interchange Fees',    txt('N6'), TEAL],
+      ['Est. Additional Operation Cost', txt('N7'), (isNeg(txt('N7'))?RED:GREEN)],
+    ];
+    kpis.forEach((k,i)=>{
+      const y = 1.5 + i*1.6;
+      s.addShape(pptx.ShapeType.rect, { x:6.0, y, w:6.7, h:1.4, fill:{color:PAPER}, line:{color:LINE, width:1}, rectRadius:0.08 });
+      s.addText(k[0], { x:6.3, y:y+0.18, w:6.1, h:0.4, fontSize:12.5, color:GREY, bold:true });
+      s.addText(k[1], { x:6.3, y:y+0.62, w:6.1, h:0.7, fontSize:30, bold:true, color:k[2] });
+    });
+
+    // ─────────── Slide 3 · Comparison table ───────────
+    s = pptx.addSlide();
+    s.background = { color: WASH };
+    slideHeader(s, modeTitle + ' — Last 12 Months', 'Operational Cost · Interchange Revenue · Fraud Savings');
+
+    const hdr = c => ({ text:c, options:{ bold:true, color:WHITE, fill:{color:NAVY}, align:'center', valign:'middle', fontSize:13 } });
+    const rowCells = (label, self, other, delta) => ([
+      { text:label, options:{ bold:true, color:INK, align:'left', valign:'middle', fill:{color:WHITE}, fontSize:13 } },
+      { text:self,  options:{ color:TEAL, align:'right', valign:'middle', fill:{color:TEAL_XL}, fontSize:13, bold:true } },
+      { text:other, options:{ color:RED,  align:'right', valign:'middle', fill:{color:'FDF0EE'}, fontSize:13 } },
+      { text:delta, options:{ color:deltaColor(delta), align:'right', valign:'middle', fill:{color:WHITE}, fontSize:13, bold:true } },
+    ]);
+    const compRows = [
+      [ hdr('Metric'), hdr(selfLabel), hdr(otherLabel), hdr('Delta (Value)') ],
+      rowCells('Operational Cost',    txt('C6'), txt('F6'), txt('I6')),
+      rowCells('Interchange Revenue', txt('D6'), txt('G6'), txt('J6')),
+      rowCells('Fraud Savings',       txt('E6'), txt('H6'), txt('K6')),
+    ];
+    s.addTable(compRows, {
+      x:0.6, y:1.7, w:12.1, colW:[3.7,2.8,2.8,2.8], rowH:0.85,
+      border:{type:'solid', color:LINE, pt:1}, valign:'middle', fontFace:'Arial',
+    });
+    s.addText('Delta = ' + (mode==='competitor' ? 'Competitor − Outseer' : 'Customer Current − (Outseer + FAdv)') +
+      '.  Green = value in Outseer’s favour.',
+      { x:0.62, y:5.4, w:12, h:0.5, fontSize:11, color:GREY, italic:true });
+
+    // ─────────── Slide 4 · Assumptions & funnel ───────────
+    s = pptx.addSlide();
+    s.background = { color: WASH };
+    slideHeader(s, 'Model Assumptions & Funnel Rates', selfLabel + ' vs ' + otherLabel + '  ·  auto-derived from 12-month inputs');
+
+    const pct = v => { const n=parseFloat(v); return isFinite(n) ? (n*100).toFixed(2)+'%' : '—'; };
+    const gbp = v => { const n=parseFloat(v); return isFinite(n) ? '£'+n.toFixed(2) : '—'; };
+    const aRows = [
+      ['Decline Rate — Vol','C15','D15','E15',pct],
+      ['Decline Rate — Val','C16','D16','E16',pct],
+      ['Challenge Rate — Vol','C17','D17','E17',pct],
+      ['Challenge Rate — Val','C18','D18','E18',pct],
+      ['Fail Rate — Vol','C19','D19','E19',pct],
+      ['Fail Rate — Val','C20','D20','E20',pct],
+      ['Case Marking Rate','C21','D21','E21',pct],
+      ['Interchange Rate','C22','D22','E22',pct],
+      ['Fraud Prevention Rate','C23','D23','E23',pct],
+      ['Ops Cost per Case','C24','D24','E24',gbp],
+    ];
+    const aHdr = c => ({ text:c, options:{ bold:true, color:WHITE, fill:{color:NAVY}, align:(c==='Metric'?'left':'right'), valign:'middle', fontSize:11.5 } });
+    const aTable = [[ aHdr('Metric'), aHdr(selfLabel), aHdr(otherLabel), aHdr('Gap') ]];
+    aRows.forEach((r,i)=>{
+      const bg = i%2 ? WASH : WHITE;
+      const gapTxt = txt(r[3]);
+      aTable.push([
+        { text:r[0], options:{ bold:true, color:INK, align:'left', fill:{color:bg}, fontSize:11.5 } },
+        { text:r[4](box(r[1])), options:{ color:TEAL, align:'right', fill:{color:bg}, fontSize:11.5, bold:true } },
+        { text:r[4](box(r[2])), options:{ color:GREY, align:'right', fill:{color:bg}, fontSize:11.5 } },
+        { text:gapTxt||'—', options:{ color:deltaColor(gapTxt), align:'right', fill:{color:bg}, fontSize:11.5, bold:true } },
+      ]);
+    });
+    s.addTable(aTable, {
+      x:0.6, y:1.7, w:12.1, colW:[4.9,2.4,2.4,2.4], rowH:0.44,
+      border:{type:'solid', color:LINE, pt:1}, valign:'middle', fontFace:'Arial',
+    });
+
+    pptx.writeFile({ fileName:'Outseer_Value_Model_QBR_' + mode + '.pptx' })
+      .then(()=>{ btn.textContent = original; btn.disabled = false; })
+      .catch(err=>{
+        console.error('PPT generation error:', err);
+        btn.textContent = original; btn.disabled = false;
+        alert('Could not generate the PowerPoint. Please try again.');
+      });
+  } catch(err){
+    console.error('PPT generation error:', err);
+    btn.textContent = original; btn.disabled = false;
+    alert('Could not generate the PowerPoint. Please try again.');
+  }
 }
 </script>
 </body>
